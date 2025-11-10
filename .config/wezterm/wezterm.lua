@@ -66,7 +66,11 @@ end
 -- Appearance
 config.font_size = 16.0
 config.color_scheme = color_scheme_for_appearance(wezterm.gui.get_appearance())
-config.colors = { tab_bar = tab_bar_from_scheme(config.color_scheme) }
+config.colors = {
+	tab_bar = tab_bar_from_scheme(config.color_scheme),
+	cursor_bg = "#e2e2e3",
+	cursor_fg = "#e2e2e3",
+}
 config.window_decorations = "RESIZE"
 config.scrollback_lines = 5000
 config.hide_tab_bar_if_only_one_tab = true
@@ -74,6 +78,11 @@ config.native_macos_fullscreen_mode = false
 config.use_fancy_tab_bar = false
 config.max_fps = 240 -- Above 120 but works better for smooth scrolling
 config.font = wezterm.font("JetBrains Mono", { weight = "Medium" })
+config.window_padding = {
+	left = "0.5cell",
+	bottom = "0.4cell",
+}
+config.warn_about_missing_glyphs = false
 
 -- Keybindings:
 
@@ -150,12 +159,12 @@ config.keys = {
 -- Add toggle for light/dark theme
 local function toggle_color_scheme(window, pane)
 	local overrides = window:get_config_overrides() or {}
-	if overrides.color_scheme == "Ayu Light (Gogh)" or overrides.color_scheme == nil then
-		overrides.color_scheme = "Sonokai (Gogh)"
-		overrides.colors = { tab_bar = tab_bar_from_scheme("Sonokai (Gogh)") }
-	else
+	if overrides.color_scheme == "Sonokai (Gogh)" or overrides.color_scheme == nil then
 		overrides.color_scheme = "Ayu Light (Gogh)"
 		overrides.colors = { tab_bar = tab_bar_from_scheme("Ayu Light (Gogh)") }
+	else
+		overrides.color_scheme = "Sonokai (Gogh)"
+		overrides.colors = { tab_bar = tab_bar_from_scheme("Sonokai (Gogh)") }
 	end
 	window:set_config_overrides(overrides)
 end
@@ -168,6 +177,10 @@ wezterm.on("augment-command-palette", function(window, pane)
 			action = wezterm.action_callback(toggle_color_scheme),
 		},
 	}
+end)
+
+wezterm.on("trigger-nvim-colorscheme", function(window, pane, scheme)
+	pane:send_text(string.format(":colorscheme %s\n", scheme))
 end)
 
 -- Return config to WezTerm

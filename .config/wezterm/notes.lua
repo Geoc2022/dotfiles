@@ -1,3 +1,5 @@
+-- Use wezterm --config-file ~/.config/wezterm/notes.lua to load a notes file
+
 local wezterm = require("wezterm")
 local mux = wezterm.mux
 
