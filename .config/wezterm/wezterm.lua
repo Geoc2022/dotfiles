@@ -80,9 +80,10 @@ config.max_fps = 240 -- Above 120 but works better for smooth scrolling
 config.font = wezterm.font("JetBrains Mono", { weight = "Medium" })
 config.window_padding = {
 	left = "0.5cell",
+	right = "0.5cell",
 	bottom = "0.4cell",
 }
-config.warn_about_missing_glyphs = false
+-- config.warn_about_missing_glyphs = false
 
 -- Keybindings:
 

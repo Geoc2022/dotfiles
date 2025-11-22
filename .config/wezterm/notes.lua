@@ -8,8 +8,8 @@ local config = main_config
 
 local notes_dir = os.getenv("NOTES_DIRECTORY") or (os.getenv("HOME") .. "/Documents/notes")
 
-config.initial_cols = 42
-config.initial_rows = 18
+config.initial_cols = 60
+config.initial_rows = 24
 
 wezterm.on("gui-startup", function(cmd)
 	local tab, pane, window = mux.spawn_window({
