@@ -11,7 +11,6 @@ fi
 autoload -U compinit; compinit -i
 
 source ~/my_zsh/zsh-defer/zsh-defer.plugin.zsh
-# zsh-defer source ~/my_zsh/fzf/fzf-tab.plugin.zsh
 
 setup_autosuggestions() {
   source ~/my_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -56,24 +55,42 @@ finder() { open -a "finder" "$@"; }
 alias firefox='/Applications/Firefox.app/Contents/MacOS/firefox'
 alias idea='open -na "IntelliJ IDEA.app"'
 alias sshbrown='ssh -A gchemmal@ssh.cs.brown.edu'
-# alias sshoscar='ssh -AtX gchemmal@ssh.ccv.brown.edu'
-alias sshoscar='ssh -AtX gchemmal@sshcampus.ccv.brown.edu'
-scposcar() {
-  scp -A gchemmal@sshcampus.ccv.brown.edu:$1 $2
-}
 alias bored='python ~/Documents/prgm/python/pgm47.py && exit'
 alias leet='cd ~/Documents/prgm/leetcode/ && python ~/Documents/prgm/leetcode/leetcode_anki.py'
 alias cs300='cd ~/Documents/courses/CS_300 && ./cs300-run-docker'
 alias cs1515='cd ~/Documents/courses/CS_1515 && ./cs1515-run-docker'
 alias bell='afplay /System/Library/Sounds/Bottle.aiff -v 3'
-alias ls='eza --icons --sort oldest --hyperlink --git'
+alias ls='eza --icons --sort newest --hyperlink --git'
 alias tree='eza --icons -T -L'
 alias haskell='ghci'
-alias notes= 'wezterm --config-file ~/.config/wezterm/notes.lua'
+alias notes='wezterm --config-file ~/.config/wezterm/notes.lua'
+alias learn-rust='
+  open -na 'Firefox' --args --new-window https://rust-book.cs.brown.edu/ && \
+  wezterm --config-file ~/.config/wezterm/rustlings.lua
+'
+
+# mv "$target" ~/.Trash
+trash() {
+  for target in "$@"; do
+    if [ -e "$target" ]; then
+      mv "$target" ~/.Trash
+    else
+      echo "trash: '$target' not found" >&2
+    fi
+  done
+}
 
 alias \
     grep="grep --color=always" \
     diff="diff --color=always"
+
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  command rm -f -- "$tmp"
+}
 
 explain() {
   local cmd
@@ -90,7 +107,6 @@ explain() {
 
   /Applications/Firefox.app/Contents/MacOS/firefox -new-tab "$url"
 }
-
 
 pbfilter() {
   if [ $# -gt 0 ]; then
@@ -112,14 +128,14 @@ zsh-defer setup_nvm
 function conda_startup() {
   # >>> conda initialize >>>
   # !! Contents within this block are managed by 'conda init' !!
-  __conda_setup="$('/Users/geo/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  __conda_setup="$('$HOME/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
   if [ $? -eq 0 ]; then
       eval "$__conda_setup"
   else
-      if [ -f "/Users/geo/anaconda3/etc/profile.d/conda.sh" ]; then
-          . "/Users/geo/anaconda3/etc/profile.d/conda.sh"
+      if [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+          . "$HOME/anaconda3/etc/profile.d/conda.sh"
       else
-          export PATH="/Users/geo/anaconda3/bin:$PATH"
+          export PATH="$HOME/anaconda3/bin:$PATH"
       fi
   fi
   unset __conda_setup
@@ -127,14 +143,15 @@ function conda_startup() {
 }
 
 function ocamel() {
-  [[ ! -r '/Users/geo/.opam/opam-init/init.zsh' ]] || source '/Users/geo/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
+  [[ ! -r '$HOME/.opam/opam-init/init.zsh' ]] || source '$HOME/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
 }
-zsh-defer ocamel
+# zsh-defer ocamel
 
 function ghcup() {
-  [ -f "/Users/geo/.ghcup/env" ] && source "/Users/geo/.ghcup/env" # ghcup-env
+  [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env" # ghcup-env
 }
-zsh-defer ghcup
+# zsh-defer ghcup
+
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -156,7 +173,7 @@ eval "$(atuin init zsh)"
 
 export MANPAGER="nvim +Man!"
 export VISUAL="nvim"
-export EDITOR="vi"
+export EDITOR="nvim"
 
 bindkey -v
 setopt autocd
@@ -166,4 +183,16 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 export PATH="$PATH:/Applications/WezTerm.app/Contents/MacOS"
 export PATH="$PATH:/Applications/Isabelle2025.app/bin"
 
-alias config='/usr/bin/git --git-dir=/Users/geo/.cfg/ --work-tree=/Users/geo'
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+alias lgconfig="lazygit --git-dir=$HOME/.cfg/ --work-tree=$HOME"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+export PATH="$PATH:/Applications/Racket/bin"
+
+export DDAR_DB_USER=$(whoami) # alphageometry

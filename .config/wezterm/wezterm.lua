@@ -21,8 +21,8 @@ local function tab_bar_from_scheme(scheme_name)
 
 	local bg = scheme.background
 	local fg = scheme.foreground
-	local darker_bg = wezterm.color.parse(bg):darken(0.1)
-	local lighter_fg = wezterm.color.parse(fg):lighten(0.2)
+	local darker_bg = wezterm.color.parse(bg):darken(0.2)
+	local lighter_fg = wezterm.color.parse(fg):lighten(0.4)
 
 	return {
 		background = darker_bg,
@@ -68,8 +68,6 @@ config.font_size = 16.0
 config.color_scheme = color_scheme_for_appearance(wezterm.gui.get_appearance())
 config.colors = {
 	tab_bar = tab_bar_from_scheme(config.color_scheme),
-	cursor_bg = "#e2e2e3",
-	cursor_fg = "#e2e2e3",
 }
 config.window_decorations = "RESIZE"
 config.scrollback_lines = 5000
@@ -83,7 +81,9 @@ config.window_padding = {
 	right = "0.5cell",
 	bottom = "0.4cell",
 }
--- config.warn_about_missing_glyphs = false
+config.default_cursor_style = "SteadyBar"
+config.force_reverse_video_cursor = true
+config.warn_about_missing_glyphs = false
 
 -- Keybindings:
 
@@ -158,7 +158,7 @@ config.keys = {
 }
 
 -- Add toggle for light/dark theme
-local function toggle_color_scheme(window, pane)
+local function toggle_color_scheme(window, _)
 	local overrides = window:get_config_overrides() or {}
 	if overrides.color_scheme == "Sonokai (Gogh)" or overrides.color_scheme == nil then
 		overrides.color_scheme = "Ayu Light (Gogh)"
@@ -170,7 +170,7 @@ local function toggle_color_scheme(window, pane)
 	window:set_config_overrides(overrides)
 end
 -- Add to CommandPalette
-wezterm.on("augment-command-palette", function(window, pane)
+wezterm.on("augment-command-palette", function(_, _)
 	return {
 		{
 			brief = "Toggle Color Scheme",
@@ -180,7 +180,7 @@ wezterm.on("augment-command-palette", function(window, pane)
 	}
 end)
 
-wezterm.on("trigger-nvim-colorscheme", function(window, pane, scheme)
+wezterm.on("trigger-nvim-colorscheme", function(_, pane, scheme)
 	pane:send_text(string.format(":colorscheme %s\n", scheme))
 end)
 
